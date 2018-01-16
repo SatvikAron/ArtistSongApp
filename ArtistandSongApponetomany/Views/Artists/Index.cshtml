@@ -1,0 +1,50 @@
+﻿@model IEnumerable<ArtistandSongApponetomany.Models.Artist>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.LastName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Email)
+                </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ArtistId">Edit</a> |
+                @*<a asp-action="Details" asp-route-id="@item.ArtistId">Details</a> |*@
+                <a asp-action="Details" asp-route-id="@item.ArtistId" asp-route-slug="@ArtistandSongApponetomany.Utils.Slug.Slugify(item.FirstName + " " + item.LastName)">Details</a> |
+
+                <a asp-action="Delete" asp-route-id="@item.ArtistId">Delete</a> |
+                <a asp-area="" asp-controller="Songs" asp-action="ByArtist" asp-route-id="@item.ArtistId">Songs</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

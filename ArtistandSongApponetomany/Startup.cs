@@ -11,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using ArtistandSongApponetomany.Data;
 using ArtistandSongApponetomany.Models;
 using ArtistandSongApponetomany.Services;
+using ArtistandSongApponetomany.Interfaces;
+using ArtistandSongApponetomany.TimeServices;
 
 namespace ArtistandSongApponetomany
 {
@@ -28,11 +30,17 @@ namespace ArtistandSongApponetomany
         {
             //services.AddDbContext<ApplicationDbContext>(options =>
             //    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseInMemoryDatabase("Test1"));
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            // add time plan'
+            ITimeProvider myFakeTimeProvider = new FakeTimeProvider();
+            myFakeTimeProvider.Now = new DateTime(2018, 2, 1);
+            services.AddSingleton<ITimeProvider>(myFakeTimeProvider);
 
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
@@ -41,7 +49,9 @@ namespace ArtistandSongApponetomany
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env,
+             ApplicationDbContext context, UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -62,8 +72,9 @@ namespace ArtistandSongApponetomany
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=Home}/{action=Index}/{id?}/{slug?}");
             });
+            DbSeed.Seed(context,userManager,roleManager);
         }
     }
 }
